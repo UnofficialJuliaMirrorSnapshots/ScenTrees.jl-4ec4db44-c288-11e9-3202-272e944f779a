@@ -16,9 +16,11 @@ For example, consider a Gaussian random walk in 5 stages. The starting value of 
 
 ![100 sample paths from Gaussian random walk](../assets/100GaussianPaths.png)
 
-Using those paths, we generate and improve a scenario tree or a scenario lattice. The number of iterations for the algorithm equals the number of sample paths that we want to generate from the stochastic process and the number of stages in the stochastic process equals the number of stages in the scenario tree or the scenario lattice. There are a lot of different branching structures that the user can choose for a tree that represents this stochastic process. The branching structure shows how many branches each node in the tree has at each stage of the tree. For example, we can use a branching structure of ``1x2x2x2x2`` for the scenario tree. This means that each node in the tree has two children. Basically, this is a `binary tree`. Using this branching structure, we obtain the following valuated probability tree that represents the above stochastic process:
+Using those paths, we generate and improve a scenario tree or a scenario lattice. The number of iterations for the algorithm equals the number of sample paths that we want to generate from the stochastic process and the number of stages in the stochastic process equals the number of stages in the scenario tree or the scenario lattice. There are a lot of different branching structures that the user can choose for a tree that represents this stochastic process. The branching structure shows how many branches each node in the tree has at each stage of the tree. For example, we can use a branching structure of `1x2x2x2x2` for the scenario tree. This means that each node in the tree has two children. Basically, this is a `binary tree`. Using this branching structure, we obtain the following valuated probability tree that represents the above stochastic process:
 
 ![Scenario Tree 1x2x2x2x2](../assets/TreeExample.png)
+
+*Figure 1: Scenario Tree 1x2x2x2x2*
 
 The above tree is optimal and therefore can be used by a decision maker for a decision making process depending on the type of problem he/she is handling.
 
@@ -42,6 +44,9 @@ A scenario tree is described by the following:
 
 A scenario tree is a mutable struct of type `Tree()`. To create a non-optimal scenario tree, we need to fix the branching structure and the dimension of the states of nodes you are wroking on. This typs `Tree()` has different methods:
 ```julia
+julia> using Pkg
+julia> Pkg.add("https://github.com/kirui93/ScenTrees.jl.git")
+julia> using ScenTrees
 julia> methods(Tree)
 # 4 methods for generic function "(::Type)":
 [1] Tree(name::String, parent::Array{Int64,1}, children::Array{Array{Int64,1},1}, state::Array{Float64,2}, probability::Array{Float64,2}) 
@@ -49,7 +54,7 @@ julia> methods(Tree)
 [3] Tree(spec::Array{Int64,1}) 
 [4] Tree(spec::Array{Int64,1}, dimension) 
 ```
-All the methods correspond to the way you can create a scenario tree. For the first method, the length of states must be equal to the length of the probabilities. In the 2nd method, you can call any of our predefined trees by just calling on the identifier (these identifiers are `0,301,302,303,304,305,306,307,401,402,4022,404,405`). And finaly the most important methods are the 3rd and 4th method. If you know the branching structure of your scenario tree, then you can create an non-optimal starting tree using it. If you don't state the dimension you ae working on, then it is defaulted into `1`. For example, `Tree([1,2,2])` creates a binary tree with states of dimension one.
+All the methods correspond to the way you can create a scenario tree. For the first method, the length of states must be equal to the length of the probabilities. In the 2nd method, you can call any of our predefined trees by just calling on the identifier (these identifiers are `0,301,302,303,304,305,306,307,401,402,4022,404,405`). And finaly the most important methods are the 3rd and 4th method. If you know the branching structure of your scenario tree, then you can create an non-optimal starting tree using it. If you don't state the dimension you ae working on, then it is defaulted into `1`. For example, `Tree([1,2,2,2,2])` creates a binary tree with states of dimension one as in Figure 1 above
 
 ## Description of a scenario lattice
 
@@ -71,7 +76,7 @@ This method is not very important becasue we only need it to produce the results
 
 ## Usage
 Since we have the basics of the scenario tree and the scenario lattice and since we created `ScenTrees.jl` with an intention of being user-friendly, we will give an example of its usage and explain each part of it. 
-In the module of `ScenTrees.jl`, we have all the exported functions that are visible to the user i.e, that are public, and the user can call these functions depending on what he/she wants to achieve with this library
+In the module of `ScenTrees.jl`, we have all the exported functions that are visible to the user i.e., that are public, and the user can call these functions depending on what he/she wants to achieve with this library
 
 ```julia
 module ScenTrees
@@ -79,12 +84,13 @@ module ScenTrees
   include("TreeApprox.jl")
   include("StochPaths.jl")
   include("LatticeApprox.jl")
-  export TreeApproximation!, LatticeApproximation, Tree, nodes, stage, height, leaves,
-        root,partTree, buildProb!, treeplot, plotD, PlotLattice,
-        GaussianSamplePath,RunningMaximum
+  include("bushinessNesDistance.jl")
+  export TreeApproximation!, LatticeApproximation,Tree,Lattice,nodes,stage,height,leaves,
+        root,partTree,buildProb!,treeplot,plotD,PlotLattice,bushinessNesDistance,
+        GaussianSamplePath1D,GaussianSamplePath2D,RunningMaximum1D,RunningMaximum2D,path
 end
 ```
-The most important functions in this module are `TreeApproximation!()` and `LatticeApproximation()` since these are the tow functions which are used to approximate scenario trees and scenario lattices respectively. The other important function is the `Tree()` function which gives the basic structure of the scenario tree.
+The most important functions in this module are `TreeApproximation!()` and `LatticeApproximation()` since these are the two functions which are used to approximate scenario trees and scenario lattices respectively. The other important function is the `Tree(BranchingStructure,dimension)` function which gives the basic starting structure of a scenario tree.
 
 All of the above functions have been documented in their respective scripts and the user can find out what each function does by putting a `?` before the function. For example, `?leaves` will give an explanation of what the function `leaves` does. 
 
