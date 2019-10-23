@@ -13,7 +13,8 @@ makedocs(
 		          "treeapprox2D.png",
 		          "ExampleLattice2.png",
 		          "LatticeApprox.png",
-			  "diffHeights.png"
+			  "diffHeights.png",
+			  "KernLattice.png"
 		          ],
 		prettyurls = get(ENV, "CI", nothing) == "true"),
 	pages = ["Home" => "index.md",
@@ -22,10 +23,9 @@ makedocs(
 			                    "tutorial/tutorial3.md",
 					    "tutorial/tutorial31.md",
 			                    "tutorial/tutorial4.md",
+					    "tutorial/tutorial41.md",
 					    "tutorial/tutorial5.md"]
 			                    ]
 )
 
-deploydocs(deps = Deps.pip("mkdocs","python-markdown-math"),
-	repo="github.com/kirui93/ScenTrees.jl.git"
-)
+deploydocs(repo="github.com/kirui93/ScenTrees.jl.git")
