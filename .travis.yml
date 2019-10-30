@@ -10,16 +10,15 @@ julia:
   - 1.2
   - nightly
   
-allow failures:
-  - julia: nightly
-  
-fast_finish: true
-
 branches:
  only:
    - master
    
-coveralls: true    
+matrix:
+  fast_finish: true
+  allow_failures:
+    - julia: nightly
+   
 codecov: true
 
 notifications:
@@ -28,8 +27,8 @@ notifications:
 env:
   - PYTHON=""
 
-script:
-  - julia -e 'using Pkg; Pkg.test("ScenTrees",coverage=true)'
+#script:
+#  - julia -e 'using Pkg; Pkg.test("ScenTrees",coverage=true)'
 
 jobs:
   include:
@@ -40,7 +39,7 @@ jobs:
         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
         - julia --project=docs/ -e 'using Pkg; Pkg.add("Documenter"); using Documenter; include("docs/make.jl")'
       after_success: skip
-
+       
 after_success:
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
