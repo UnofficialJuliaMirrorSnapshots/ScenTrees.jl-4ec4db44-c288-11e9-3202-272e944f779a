@@ -3,9 +3,9 @@
 CurrentModule = ScenTrees
 ```
 
-# Stochastic Approximation Process
+# Stochastic approximation process
 
-This package was made for this purpose. Given a stochastic process, we want to approximate the process using either a scenario tree or a scenario lattice.
+This package follows the stochastic approximation procedure in [Pflug and Pichler (2015)](https://doi.org/10.1007/s10589-015-9758-0). Given a stochastic process, we want to approximate the process using either a scenario tree or a scenario lattice.
 
 Every stochastic approximation iteration modifies one path within the tree towards the new sequence. In this way the approximating quality of the tree is improved each time a new sample is observed. The tree is not stable in the beginning but with more and more iterations, the scenario tree converges in probability. The resulting tree can be used for decision making process.
 
@@ -57,7 +57,7 @@ Consider the following. We want to approximate the Gaussian random walk in 4 sta
 ```julia
 julia> using ScenTrees
 julia> ex2 = Tree([1,3,3,3],1)
-julia> sol1 = TreeApproximation!(ex2, GaussianSamplePath1D,1000000,2,2)
+julia> sol1 = TreeApproximation!(ex2, GaussianSamplePath1D,100000,2,2)
 julia> treeplot(sol1)
 julia> savefig("treeapprox1.png")
 ```
@@ -92,11 +92,17 @@ We can therefore do approximations in 2 dimension as follows:
 ```julia
 julia> ex3 = Tree([1,3,3,3],2);
 julia> sol2 = TreeApproximation!(ex3,GaussianSamplePath2D,1000000,2,2);
-julia> plotD(sol2)
-julia> savefig("treeapprox2D.png")
+julia> trees = partTree(sol2)
+julia> treeplot(trees[1])
+julia> savefig("trees1.png")
+julia> treeplot(trees[2])
+julia> savefig("trees2.png")
 ```
+Each of these scenario trees have a multistage distance of `0.25142` from the original stochastic process.
 
-![Example of a valuated tree in 2D](../assets/treeapprox2D.png)
+|[![Tree for state 1](../assets/trees1.png)](../assets/trees1.png)| [![Tree for state 2](../assets/trees2.png)](../assets/trees2.png) |
+|:-----------:|:--------------:|
+| Tree for state 1 | Tree for state 2 |
 
 ## Lattice Approximation
 
@@ -119,7 +125,17 @@ Consider the following example. We want to approximate a Gaussian random walk of
 ```julia
 julia> sol4 = LatticeApproximation([1,3,4,5],GaussianSamplePath1D,1000000);
 ```
-The result of the above approximation is a scenario lattice which represents the stochastic process in the best way. This scenario lattice can be used for decision making process under uncertainty 
+The result of the above approximation is a scenario lattice which represents the stochastic process in the best way. The distance between the scenario tree and the original process is `0.8388`. This scenario lattice can thus be used for decision making process under uncertainty.
+
+Notice that the sum of probabilities of the scenario lattice at each stage is equal to 1.
+```julia
+julia> sum.(sol4.probability)
+4-element Array{Float64,1}:
+1.0
+1.0
+0.999999999
+1.0
+```
 
 !!! info
     To visualize a scenario lattice, we use the `PlotLattice` function.
@@ -133,7 +149,7 @@ The above approximation gives the following output:
 
 ![Example of an approximated lattice](../assets/LatticeApprox.png)
 
-You can see that in the scenario lattice, we have many possibilities than in a scenario tree. Hence, some people prefer a scenario lattice than a scenario tree.
+You can see that in the scenario lattice, we have many possibilities than in a scenario tree. This shows generally that scenario lattices with half the number of nodes of a scenario tree have more number of scenarios or trajectories. A scenario lattice does not aloow to trace back the history of a given scenario based on its ending node as there are many possible paths at that node. This is the main reason why we consider scenario lattices for Markovian processes
 
 !!! info
     Currently, lattice approximation can only work for 1 dimension. It is in our working plan to generalize and extend this lattice approximation to any dimension of the states of the scenario lattice.
